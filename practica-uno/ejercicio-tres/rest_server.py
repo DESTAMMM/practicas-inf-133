@@ -73,7 +73,7 @@ class HTTPResponseHandler:
         handler.wfile.write(json.dumps(data).encode("utf-8"))
 
     @staticmethod
-    def read_data(handler):
+    def handle_reader(handler):
         content_length = int(handler.headers["Content-Length"])
         data = handler.rfile.read(content_length)
         return json.loads(data.decode("utf-8"))
@@ -114,7 +114,7 @@ class RESTRequestHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         if self.path == "/pacientes":
-            data = HTTPResponseHandler.read_data(self)
+            data = HTTPResponseHandler.handle_reader(self)
             paciente = PacientesService.add_paciente(data)
             HTTPResponseHandler.handle_response(self, 201, paciente)
         else:
@@ -125,7 +125,7 @@ class RESTRequestHandler(BaseHTTPRequestHandler):
     def do_PUT(self):
         if self.path.startswith("/pacientes/"):
             ci = self.path.split("/")[-1]
-            data = HTTPResponseHandler.read_data(self)
+            data = HTTPResponseHandler.handle_reader(self)
             paciente = PacientesService.update_paciente(ci, data)
             if paciente:
                 HTTPResponseHandler.handle_response(self, 200, paciente)
